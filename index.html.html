@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>معرض الصور المصنفة</title>
+    <style>
+        :root {
+            --primary-color: #4285f4;
+            --secondary-color: #34a853;
+            --danger-color: #ea4335;
+            --light-gray: #f5f5f5;
+            --dark-gray: #333;
+            --border-radius: 8px;
+            --box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-gray);
+            background-color: var(--light-gray);
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            margin: 0;
+        }
+        
+        .auth-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #3367d6;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #d33426;
+        }
+        
+        .upload-section {
+            background-color: white;
+            padding: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            margin-bottom: 30px;
+            display: none;
+        }
+        
+        .upload-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+        
+        .file-input-label {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: var(--secondary-color);
+            color: white;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .file-input-label:hover {
+            background-color: #2d9246;
+        }
+        
+        #fileInput {
+            display: none;
+        }
+        
+        .preview-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+            min-height: 100px;
+            align-items: center;
+            justify-content: center;
+            border: 2px dashed #ddd;
+            border-radius: var(--border-radius);
+            padding: 20px;
+        }
+        
+        .preview-item {
+            width: 150px;
+            height: 150px;
+            position: relative;
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .category-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .category-tab {
+            padding: 8px 16px;
+            background-color: #e0e0e0;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .category-tab:hover, .category-tab.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .gallery-item {
+            background-color: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--box-shadow);
+            transition: transform 0.3s;
+        }
+        
+        .gallery-item:hover {
+            transform: translateY(-5px);
+        }
+        
+        .gallery-item img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        
+        .gallery-item-info {
+            padding: 15px;
+        }
+        
+        .gallery-item-info h3 {
+            margin: 0 0 5px 0;
+            font-size: 16px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .gallery-item-info p {
+            margin: 0;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .gallery-item-category {
+            display: inline-block;
+            padding: 3px 8px;
+            background-color: #e0e0e0;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        
+        .login-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            max-width: 400px;
+            margin: 50px auto;
+        }
+        
+        .login-container h2 {
+            margin-top: 0;
+            color: var(--primary-color);
+            text-align: center;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            background-color: white;
+        }
+        
+        .status-message {
+            padding: 12px;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .error {
+            background-color: #ffebee;
+            color: #c62828;
+            border: 1px solid #ef9a9a;
+        }
+        
+        .success {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #a5d6a7;
+        }
+        
+        .empty-gallery {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+            font-size: 18px;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            grid-column: 1 / -1;
+        }
+        
+        .user-info {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        /* New styles for delete functionality */
+        .gallery-item-actions {
+            display: flex;
+            justify-content: flex-end;
+            padding: 8px;
+            background-color: #f5f5f5;
+            border-top: 1px solid #ddd;
+        }
+        
+        .delete-btn {
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .delete-btn:hover {
+            background-color: #d33426;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>معرض الوثائق الإدارية</h1>
+        <div class="auth-section" id="authSection">
+            <span class="user-info" id="userInfo"></span>
+            <button class="btn btn-danger" id="logoutBtn" style="display: none;">تسجيل الخروج</button>
+        </div>
+    </header>
+
+    <div class="login-container" id="loginContainer">
+        <h2>تسجيل الدخول</h2>
+        <div class="status-message" id="loginMessage"></div>
+        <div class="form-group">
+            <label for="username">اسم المستخدم</label>
+            <input type="text" id="username" placeholder="أدخل اسم المستخدم">
+        </div>
+        <div class="form-group">
+            <label for="password">كلمة المرور</label>
+            <input type="password" id="password" placeholder="أدخل كلمة المرور">
+        </div>
+        <button class="btn btn-primary" id="loginBtn">تسجيل الدخول</button>
+    </div>
+
+    <div class="upload-section" id="uploadSection">
+        <h2>رفع وثائق جديدة</h2>
+        <div class="upload-controls">
+            <label for="fileInput" class="file-input-label">اختر ملفات</label>
+            <input type="file" id="fileInput" accept="image/*" multiple>
+            <select id="categorySelect" class="form-group">
+                <option value="التعاميم">التعاميم</option>
+                <option value="كتب الشكر">كتب الشكر</option>
+                <option value="اوامر العلاوات">اوامر العلاوات</option>
+                <option value="اوامر الترفيعات">اوامر الترفيعات</option>
+                <option value="اوامر اللجان">اوامر اللجان</option>
+            </select>
+            <button class="btn btn-primary" id="uploadBtn">رفع إلى القسم المحدد</button>
+        </div>
+        <div class="status-message" id="uploadMessage"></div>
+        <div class="preview-container" id="previewContainer">
+            <span>لم يتم اختيار أي ملفات</span>
+        </div>
+    </div>
+
+    <div class="gallery-container">
+        <h2>المعرض</h2>
+        <div class="category-tabs" id="categoryTabs">
+            <div class="category-tab active" data-category="all">الكل</div>
+            <div class="category-tab" data-category="التعاميم">التعاميم</div>
+            <div class="category-tab" data-category="كتب الشكر">كتب الشكر</div>
+            <div class="category-tab" data-category="اوامر العلاوات">اوامر العلاوات</div>
+            <div class="category-tab" data-category="اوامر الترفيعات">اوامر الترفيعات</div>
+            <div class="category-tab" data-category="اوامر اللجان">اوامر اللجان</div>
+        </div>
+        <div class="gallery" id="imageGallery">
+            <!-- Images will be loaded here -->
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const loginContainer = document.getElementById('loginContainer');
+        const uploadSection = document.getElementById('uploadSection');
+        const authSection = document.getElementById('authSection');
+        const userInfo = document.getElementById('userInfo');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const loginBtn = document.getElementById('loginBtn');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const loginMessage = document.getElementById('loginMessage');
+        const uploadMessage = document.getElementById('uploadMessage');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const fileInput = document.getElementById('fileInput');
+        const categorySelect = document.getElementById('categorySelect');
+        const previewContainer = document.getElementById('previewContainer');
+        const imageGallery = document.getElementById('imageGallery');
+        const categoryTabs = document.getElementById('categoryTabs');
+
+        // Valid credentials
+        const validUsers = [
+            { username: "admin", password: "admin123" },
+            { username: "user", password: "user123" }
+        ];
+
+        // Image storage with categories
+        let galleryImages = JSON.parse(localStorage.getItem('galleryImages')) || [];
+
+        // Current user and selected category
+        let currentUser = null;
+        let currentCategory = "all";
+
+        // Initialize the page
+        function init() {
+            // Check if user is already logged in
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                showAuthenticatedUI();
+            }
+            
+            loadGallery();
+            setupEventListeners();
+        }
+
+        // Set up event listeners
+        function setupEventListeners() {
+            // Category tab clicks
+            document.querySelectorAll('.category-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.category-tab').forEach(t => 
+                        t.classList.remove('active'));
+                    tab.classList.add('active');
+                    currentCategory = tab.dataset.category;
+                    loadGallery();
+                });
+            });
+        }
+
+        // Load gallery images filtered by category with delete buttons
+        function loadGallery() {
+            imageGallery.innerHTML = '';
+            
+            const filteredImages = currentCategory === "all" 
+                ? galleryImages 
+                : galleryImages.filter(img => img.category === currentCategory);
+            
+            if (filteredImages.length === 0) {
+                imageGallery.innerHTML = `
+                    <div class="empty-gallery">
+                        لا توجد وثائق ${currentCategory === "all" ? "في المعرض" : "في هذا القسم"} بعد.
+                        ${currentUser ? 'قم برفع بعض الوثائق!' : 'سجل الدخول لرفع الوثائق!'}
+                    </div>
+                `;
+                return;
+            }
+            
+            filteredImages.forEach(image => {
+                const imageElement = document.createElement('div');
+                imageElement.className = 'gallery-item';
+                imageElement.innerHTML = `
+                    <img src="${image.url}" alt="${image.name}">
+                    <div class="gallery-item-info">
+                        <h3>${image.name}</h3>
+                        <p>تم الرفع بواسطة ${image.uploadedBy} في ${image.date}</p>
+                        <span class="gallery-item-category">${image.category}</span>
+                    </div>
+                    ${currentUser ? `
+                    <div class="gallery-item-actions">
+                        <button class="delete-btn" data-id="${image.id}">حذف</button>
+                    </div>
+                    ` : ''}
+                `;
+                imageGallery.appendChild(imageElement);
+            });
+            
+            // Add event listeners to delete buttons
+            if (currentUser) {
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const id = parseInt(e.target.getAttribute('data-id'));
+                        deleteImage(id);
+                    });
+                });
+            }
+        }
+        
+        // Delete an image by ID
+        function deleteImage(id) {
+            if (confirm('هل أنت متأكد أنك تريد حذف هذه الوثيقة؟')) {
+                galleryImages = galleryImages.filter(img => img.id !== id);
+                localStorage.setItem('galleryImages', JSON.stringify(galleryImages));
+                loadGallery();
+                showMessage(uploadMessage, 'تم حذف الوثيقة بنجاح', 'success');
+            }
+        }
+
+        // Show authenticated UI
+        function showAuthenticatedUI() {
+            loginContainer.style.display = 'none';
+            uploadSection.style.display = 'block';
+            userInfo.textContent = `مرحباً، ${currentUser.username}`;
+            userInfo.style.display = 'inline';
+            logoutBtn.style.display = 'block';
+        }
+
+        // Show login UI
+        function showLoginUI() {
+            loginContainer.style.display = 'block';
+            uploadSection.style.display = 'none';
+            userInfo.style.display = 'none';
+            logoutBtn.style.display = 'none';
+            usernameInput.value = '';
+            passwordInput.value = '';
+        }
+
+        // Show status message
+        function showMessage(element, message, type) {
+            element.textContent = message;
+            element.className = `status-message ${type}`;
+            element.style.display = 'block';
+            
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 3000);
+        }
+
+        // Event Listeners
+        loginBtn.addEventListener('click', () => {
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value.trim();
+            
+            if (!username || !password) {
+                showMessage(loginMessage, 'الرجاء إدخال اسم المستخدم وكلمة المرور', 'error');
+                return;
+            }
+            
+            // Check credentials
+            const user = validUsers.find(u => u.username === username && u.password === password);
+            
+            if (user) {
+                currentUser = { username };
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                showAuthenticatedUI();
+                showMessage(loginMessage, 'تم تسجيل الدخول بنجاح!', 'success');
+            } else {
+                showMessage(loginMessage, 'اسم المستخدم أو كلمة المرور غير صحيحة', 'error');
+            }
+        });
+
+        logoutBtn.addEventListener('click', () => {
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            showLoginUI();
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            const files = Array.from(e.target.files);
+            previewContainer.innerHTML = '';
+            
+            if (files.length === 0) {
+                previewContainer.innerHTML = '<span>لم يتم اختيار أي ملفات</span>';
+                return;
+            }
+            
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const previewItem = document.createElement('div');
+                    previewItem.className = 'preview-item';
+                    previewItem.innerHTML = `<img src="${event.target.result}" alt="${file.name}">`;
+                    previewContainer.appendChild(previewItem);
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+
+        uploadBtn.addEventListener('click', () => {
+            const files = Array.from(fileInput.files);
+            const category = categorySelect.value;
+            
+            if (files.length === 0) {
+                showMessage(uploadMessage, 'الرجاء اختيار ملف واحد على الأقل', 'error');
+                return;
+            }
+            
+            showMessage(uploadMessage, 'جاري رفع الملفات...', 'success');
+            
+            // Process each file
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const newImage = {
+                        id: Date.now(),
+                        name: file.name.split('.')[0] || 'بدون عنوان',
+                        url: event.target.result,
+                        uploadedBy: currentUser.username,
+                        date: new Date().toLocaleDateString('ar-EG'),
+                        category: category
+                    };
+                    
+                    galleryImages.push(newImage);
+                    localStorage.setItem('galleryImages', JSON.stringify(galleryImages));
+                    
+                    // If viewing the category or "all", update the gallery
+                    if (currentCategory === "all" || currentCategory === category) {
+                        loadGallery();
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+            
+            // Reset file input
+            fileInput.value = '';
+            setTimeout(() => {
+                previewContainer.innerHTML = '<span>لم يتم اختيار أي ملفات</span>';
+                showMessage(uploadMessage, `تم رفع الملفات إلى قسم ${category} بنجاح!`, 'success');
+            }, 1000);
+        });
+
+        // Initialize the application
+        init();
+    </script>
+</body>
+</html>
